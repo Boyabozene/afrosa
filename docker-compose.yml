@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:16
+    container_name: afrosa_db
+    environment:
+      POSTGRES_DB: afrosa
+      POSTGRES_USER: afrosa_user
+      POSTGRES_PASSWORD: afrosa123
+    ports:
+      - "5432:5432"
+    volumes:
+      - afrosa_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: afrosa_backend
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://afrosa_user:afrosa_pass@db:5432/afrosa
+      JWT_SECRET: afrosa_jwt_secret_change_en_prod
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+volumes:
+  afrosa_data:
