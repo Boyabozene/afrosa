@@ -1,7 +1,9 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const db = require('./config/db');
+const pool = require('./config/db');
+
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 
@@ -14,12 +16,14 @@ app.get('/', (req, res) => {
 
 app.get('/health', async (req, res) => {
   try {
-    await db.query('SELECT NOW()');
+    await pool.query('SELECT NOW()');
     res.json({ status: 'ok', database: 'connectée' });
   } catch (err) {
     res.status(500).json({ status: 'erreur', database: err.message });
   }
 });
+
+app.use('/api/auth', authRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
