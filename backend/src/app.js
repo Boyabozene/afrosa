@@ -9,6 +9,9 @@ const app = express();
 const { verifierToken } = require('./middlewares/authMiddleware');
 const { verifierRole } = require('./middlewares/roleMiddleware');
 
+const salonRoutes = require('./routes/salonRoutes');
+const soinRoutes = require('./routes/soinRoutes');
+
 app.use(cors());
 app.use(express.json());
 
@@ -26,6 +29,8 @@ app.get('/health', async (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/salons', salonRoutes);
+app.use('/api/soins', soinRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.get('/api/test-admin', verifierToken, verifierRole('admin'), (req, res) => {
