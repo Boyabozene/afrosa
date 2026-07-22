@@ -6,6 +6,8 @@ const pool = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 
 const app = express();
+const { verifierToken } = require('./middlewares/authMiddleware');
+const { verifierRole } = require('./middlewares/roleMiddleware');
 
 app.use(cors());
 app.use(express.json());
@@ -26,6 +28,9 @@ app.get('/health', async (req, res) => {
 app.use('/api/auth', authRoutes);
 
 const PORT = process.env.PORT || 3000;
+app.get('/api/test-admin', verifierToken, verifierRole('admin'), (req, res) => {
+  res.json({ message: 'Accès admin OK', utilisateur: req.utilisateur });
+});
 app.listen(PORT, () => {
   console.log(`Afrosa API démarrée sur le port ${PORT}`);
 });
