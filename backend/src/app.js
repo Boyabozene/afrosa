@@ -40,12 +40,13 @@ app.use('/api/reservations/salon', reservationSalonRoutes);
 app.use('/api/reservations/domicile', reservationDomicileRoutes);
 app.use('/api/locations', locationRoutes);
 
-const PORT = process.env.PORT || 3000;
-app.get('/api/test-admin', verifierToken, verifierRole('admin'), (req, res) => {
-  res.json({ message: 'Accès admin OK', utilisateur: req.utilisateur });
-});
-app.listen(PORT, () => {
-  console.log(`Afrosa API démarrée sur le port ${PORT}`);
-});
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Afrosa API démarrée sur le port ${PORT}`);
+  });
+}
+
+module.exports = app;
 
 module.exports = app;
