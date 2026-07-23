@@ -1,14 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
+
 const pool = require('./config/db');
-
 const authRoutes = require('./routes/authRoutes');
-
-const app = express();
-const { verifierToken } = require('./middlewares/authMiddleware');
-const { verifierRole } = require('./middlewares/roleMiddleware');
-
 const salonRoutes = require('./routes/salonRoutes');
 const soinRoutes = require('./routes/soinRoutes');
 const coiffeuseRoutes = require('./routes/coiffeuseRoutes');
@@ -16,26 +13,7 @@ const reservationSalonRoutes = require('./routes/reservationSalonRoutes');
 const reservationDomicileRoutes = require('./routes/reservationDomicileRoutes');
 const locationRoutes = require('./routes/locationRoutes');
 
-const fs = require('fs');
-const path = require('path');
-
-const runMigrations = async () => {
-  const pool = require('./config/db');
-  const migrationsPath = path.join(__dirname, '../database/migrations');
-  if (!fs.existsSync(migrationsPath)) return;
-  const files = fs.readdirSync(migrationsPath).sort();
-  for (const file of files) {
-    const sql = fs.readFileSync(path.join(migrationsPath, file), 'utf8');
-    try {
-      await pool.query(sql);
-      console.log(`Migration OK: ${file}`);
-    } catch (err) {
-      if (!err.message.includes('already exists')) {
-        console.error(`Migration erreur ${file}:`, err.message);
-      }
-    }
-  }
-};
+const app = express();
 
 app.use(cors());
 app.use(express.json());
@@ -61,14 +39,48 @@ app.use('/api/reservations/salon', reservationSalonRoutes);
 app.use('/api/reservations/domicile', reservationDomicileRoutes);
 app.use('/api/locations', locationRoutes);
 
+const runMigrations = async () => {
+  const migrationsPath = path.join(__dirname, '../database/migrations');
+  if (!fs.existsSync(migrationsPath)) return;
+  const files = fs.readdirSync(migrationsPath).sort();
+  for (const file of files) {
+    const sql = fs.readFileSync(path.join(migrationsPath, file), 'utf8');
+    try {
+      await pool.query(sql);
+      console.log(`Migration OK: ${file}`);
+    } catch (err) {
+      if (!err.message.includes('already exists')) {
+        console.error(`Migration erreur ${file}:`, err.message);
+      }
+    }
+  }
+};
+
+const runSeeds = async () => {
+  const seedsPath = path.join(__dirname, '../database/seeds');
+  if (!fs.existsSync(seedsPath)) return;
+  const files = fs.readdirSync(seedsPath).sort();
+  for (const file of files) {
+    const sql = fs.readFileSync(path.join(seedsPath, file), 'utf8');
+    try {
+      await pool.query(sql);
+      console.log(`Seed OK: ${file}`);
+    } catch (err) {
+      if (!err.message.includes('already exists') && !err.message.includes('duplicate')) {
+        console.error(`Seed erreur ${file}:`, err.message);
+      }
+    }
+  }
+};
+
 if (require.main === module) {
   const PORT = process.env.PORT || 3000;
-  runMigrations().then(() => console.log('Migrations terminées'));
-  app.listen(PORT, () => {
+  app.listen(PORT, async () => {
     console.log(`Afrosa API démarrée sur le port ${PORT}`);
+    await runMigrations();
+    await runSeeds();
+    console.log('Base de données prête');
   });
 }
-
-module.exports = app;
 
 module.exports = app;
