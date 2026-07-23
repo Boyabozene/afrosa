@@ -16,6 +16,27 @@ const reservationSalonRoutes = require('./routes/reservationSalonRoutes');
 const reservationDomicileRoutes = require('./routes/reservationDomicileRoutes');
 const locationRoutes = require('./routes/locationRoutes');
 
+const fs = require('fs');
+const path = require('path');
+
+const runMigrations = async () => {
+  const pool = require('./config/db');
+  const migrationsPath = path.join(__dirname, '../../database/migrations');
+  if (!fs.existsSync(migrationsPath)) return;
+  const files = fs.readdirSync(migrationsPath).sort();
+  for (const file of files) {
+    const sql = fs.readFileSync(path.join(migrationsPath, file), 'utf8');
+    try {
+      await pool.query(sql);
+      console.log(`Migration OK: ${file}`);
+    } catch (err) {
+      if (!err.message.includes('already exists')) {
+        console.error(`Migration erreur ${file}:`, err.message);
+      }
+    }
+  }
+};
+
 app.use(cors());
 app.use(express.json());
 
@@ -42,6 +63,7 @@ app.use('/api/locations', locationRoutes);
 
 if (require.main === module) {
   const PORT = process.env.PORT || 3000;
+  runMigrations().then(() => console.log('Migrations terminées'));
   app.listen(PORT, () => {
     console.log(`Afrosa API démarrée sur le port ${PORT}`);
   });
