@@ -12,6 +12,9 @@ const { verifierRole } = require('./middlewares/roleMiddleware');
 const salonRoutes = require('./routes/salonRoutes');
 const soinRoutes = require('./routes/soinRoutes');
 const coiffeuseRoutes = require('./routes/coiffeuseRoutes');
+const reservationSalonRoutes = require('./routes/reservationSalonRoutes');
+const reservationDomicileRoutes = require('./routes/reservationDomicileRoutes');
+const locationRoutes = require('./routes/locationRoutes');
 
 app.use(cors());
 app.use(express.json());
@@ -33,6 +36,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/salons', salonRoutes);
 app.use('/api/soins', soinRoutes);
 app.use('/api/coiffeuses', coiffeuseRoutes);
+app.use('/api/reservations/salon', reservationSalonRoutes);
+app.use('/api/reservations/domicile', reservationDomicileRoutes);
+app.use('/api/locations', locationRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.get('/api/test-admin', verifierToken, verifierRole('admin'), (req, res) => {
