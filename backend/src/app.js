@@ -21,7 +21,7 @@ const path = require('path');
 
 const runMigrations = async () => {
   const pool = require('./config/db');
-  const migrationsPath = path.join(__dirname, '../../database/migrations');
+  const migrationsPath = path.join(__dirname, '../database/migrations');
   if (!fs.existsSync(migrationsPath)) return;
   const files = fs.readdirSync(migrationsPath).sort();
   for (const file of files) {
