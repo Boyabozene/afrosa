@@ -78,7 +78,13 @@ if (require.main === module) {
   app.listen(PORT, async () => {
     console.log(`Afrosa API démarrée sur le port ${PORT}`);
     await runMigrations();
-    await runSeeds();
+    const { rows } = await pool.query('SELECT COUNT(*) FROM salons');
+	if (parseInt(rows[0].count) === 0) {
+  	await runSeeds();
+  	console.log('Seeds exécutés');
+	} else {
+  	console.log('Base déjà peuplée, seeds ignorés');
+	}
     console.log('Base de données prête');
   });
 }
