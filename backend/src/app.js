@@ -97,4 +97,46 @@ app.get('/api/cleanup', async (req, res) => {
   }
 });
 
+app.get('/api/reseed', async (req, res) => {
+  try {
+    const salons = await pool.query('SELECT id, nom FROM salons ORDER BY nom');
+    const salonGombe = salons.rows.find(s => s.nom === 'Afrosa Gombe')?.id;
+    const salonKinshasa = salons.rows.find(s => s.nom === 'Afrosa Kinshasa')?.id;
+    const salonNgaliema = salons.rows.find(s => s.nom === 'Afrosa Ngaliema')?.id;
+
+    await pool.query(`
+      INSERT INTO utilisateurs (nom, prenom, email, mot_de_passe, telephone, role) VALUES
+      ('Diallo', 'Aminata', 'aminata@afrosa.cd', '$2b$10$placeholder_hash', '+243810000001', 'coiffeuse'),
+      ('Mbaye', 'Fatou', 'fatou@afrosa.cd', '$2b$10$placeholder_hash', '+243810000002', 'coiffeuse'),
+      ('Kouassi', 'Binta', 'binta@afrosa.cd', '$2b$10$placeholder_hash', '+243810000003', 'coiffeuse')
+      ON CONFLICT (email) DO NOTHING
+    `);
+
+    await pool.query(`
+      INSERT INTO coiffeuses (utilisateur_id, salon_id, bio, disponible_domicile, disponible_location, tarif_journee)
+      SELECT u.id, $1, 'Spécialiste tresses et soins naturels, 5 ans d''expérience.', true, true, 50.00
+      FROM utilisateurs u WHERE u.email = 'aminata@afrosa.cd'
+      ON CONFLICT DO NOTHING
+    `, [salonGombe]);
+
+    await pool.query(`
+      INSERT INTO coiffeuses (utilisateur_id, salon_id, bio, disponible_domicile, disponible_location, tarif_journee)
+      SELECT u.id, $1, 'Experte tissage et perruques, coiffures de mariée.', true, true, 60.00
+      FROM utilisateurs u WHERE u.email = 'fatou@afrosa.cd'
+      ON CONFLICT DO NOTHING
+    `, [salonKinshasa]);
+
+    await pool.query(`
+      INSERT INTO coiffeuses (utilisateur_id, salon_id, bio, disponible_domicile, disponible_location, tarif_journee)
+      SELECT u.id, $1, 'Passionnée de locks et coiffures naturelles.', false, true, 45.00
+      FROM utilisateurs u WHERE u.email = 'binta@afrosa.cd'
+      ON CONFLICT DO NOTHING
+    `, [salonNgaliema]);
+
+    res.json({ message: 'Coiffeuses recréées', salons: { gombe: salonGombe, kinshasa: salonKinshasa, ngaliema: salonNgaliema } });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = app;
