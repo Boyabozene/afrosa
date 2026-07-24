@@ -83,4 +83,18 @@ if (require.main === module) {
   });
 }
 
+app.get('/api/cleanup', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM soins a USING soins b WHERE a.nom = b.nom AND a.ctid > b.ctid');
+    await pool.query('DELETE FROM types_soins a USING types_soins b WHERE a.nom = b.nom AND a.ctid > b.ctid');
+    await pool.query('DELETE FROM gammes a USING gammes b WHERE a.nom = b.nom AND a.ctid > b.ctid');
+    await pool.query('DELETE FROM coiffeuses a USING coiffeuses b WHERE a.utilisateur_id = b.utilisateur_id AND a.ctid > b.ctid');
+    await pool.query('DELETE FROM utilisateurs a USING utilisateurs b WHERE a.email = b.email AND a.ctid > b.ctid');
+    await pool.query('DELETE FROM salons a USING salons b WHERE a.nom = b.nom AND a.ctid > b.ctid');
+    res.json({ message: 'Doublons supprimés' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = app;
