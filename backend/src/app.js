@@ -119,6 +119,17 @@ app.get('/api/cleanup', async (req, res) => {
 });
 
 app.get('/api/reseed', async (req, res) => {
+
+  await pool.query('DELETE FROM specialites_coiffeuses');
+  await pool.query('DELETE FROM reservations_salon');
+  await pool.query('DELETE FROM reservations_domicile');
+  await pool.query('DELETE FROM locations_coiffeuse');
+  await pool.query('DELETE FROM coiffeuses');
+  await pool.query('DELETE FROM utilisateurs');
+  await pool.query('DELETE FROM soins');
+  await pool.query('DELETE FROM types_soins');
+  await pool.query('DELETE FROM gammes');
+  await pool.query('DELETE FROM salons');
   try {
     const salons = await pool.query('SELECT id, nom FROM salons ORDER BY nom');
     const salonGombe = salons.rows.find(s => s.nom === 'Afrosa Gombe')?.id;
