@@ -31,6 +31,21 @@ app.get('/health', async (req, res) => {
   }
 });
 
+app.get('/api/migrate-cdf', async (req, res) => {
+  try {
+    await pool.query(`
+      ALTER TABLE soins ADD COLUMN IF NOT EXISTS prix_salon_cdf DECIMAL(12,2);
+      ALTER TABLE soins ADD COLUMN IF NOT EXISTS prix_domicile_cdf DECIMAL(12,2);
+      ALTER TABLE reservations_salon ADD COLUMN IF NOT EXISTS devise VARCHAR(3) DEFAULT 'USD';
+      ALTER TABLE reservations_domicile ADD COLUMN IF NOT EXISTS devise VARCHAR(3) DEFAULT 'USD';
+      ALTER TABLE locations_coiffeuse ADD COLUMN IF NOT EXISTS devise VARCHAR(3) DEFAULT 'USD';
+    `);
+    res.json({ message: 'Colonnes CDF ajoutées' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/salons', salonRoutes);
 app.use('/api/soins', soinRoutes);
