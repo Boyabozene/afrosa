@@ -110,6 +110,86 @@ app.get('/api/reseed', async (req, res) => {
     const salonKinshasa = salons.rows.find(s => s.nom === 'Afrosa Kinshasa')?.id;
     const salonNgaliema = salons.rows.find(s => s.nom === 'Afrosa Ngaliema')?.id;
 
+await pool.query(`
+  INSERT INTO gammes (nom, description) VALUES
+  ('Signature', 'Notre gamme premium de soins sur mesure'),
+  ('Naturelle', 'Soins doux aux ingrédients naturels'),
+  ('Événement', 'Coiffures élaborées pour vos occasions spéciales')
+  ON CONFLICT DO NOTHING
+`);
+
+await pool.query(`
+  INSERT INTO types_soins (gamme_id, nom)
+  SELECT id, 'Tresses & Braids' FROM gammes WHERE nom = 'Signature'
+  ON CONFLICT DO NOTHING
+`);
+await pool.query(`
+  INSERT INTO types_soins (gamme_id, nom)
+  SELECT id, 'Soins & Traitements' FROM gammes WHERE nom = 'Naturelle'
+  ON CONFLICT DO NOTHING
+`);
+await pool.query(`
+  INSERT INTO types_soins (gamme_id, nom)
+  SELECT id, 'Tissage & Perruques' FROM gammes WHERE nom = 'Signature'
+  ON CONFLICT DO NOTHING
+`);
+await pool.query(`
+  INSERT INTO types_soins (gamme_id, nom)
+  SELECT id, 'Coiffures Événement' FROM gammes WHERE nom = 'Événement'
+  ON CONFLICT DO NOTHING
+`);
+
+await pool.query(`
+  INSERT INTO soins (type_soin_id, nom, description, duree_minutes, prix_salon, prix_salon_cdf, prix_domicile, prix_domicile_cdf)
+  SELECT id, 'Box braids mi-longues', 'Tresses protectrices mi-longues', 240, 40.00, 88000.00, 55.00, 121000.00 FROM types_soins WHERE nom = 'Tresses & Braids'
+  ON CONFLICT DO NOTHING
+`);
+await pool.query(`
+  INSERT INTO soins (type_soin_id, nom, description, duree_minutes, prix_salon, prix_salon_cdf, prix_domicile, prix_domicile_cdf)
+  SELECT id, 'Box braids longues', 'Tresses protectrices longues', 360, 60.00, 132000.00, 80.00, 176000.00 FROM types_soins WHERE nom = 'Tresses & Braids'
+  ON CONFLICT DO NOTHING
+`);
+await pool.query(`
+  INSERT INTO soins (type_soin_id, nom, description, duree_minutes, prix_salon, prix_salon_cdf, prix_domicile, prix_domicile_cdf)
+  SELECT id, 'Vanilles / Twists', 'Twists naturels et élégants', 180, 30.00, 66000.00, 40.00, 88000.00 FROM types_soins WHERE nom = 'Tresses & Braids'
+  ON CONFLICT DO NOTHING
+`);
+await pool.query(`
+  INSERT INTO soins (type_soin_id, nom, description, duree_minutes, prix_salon, prix_salon_cdf, prix_domicile, prix_domicile_cdf)
+  SELECT id, 'Shampoing + Brushing', 'Lavage et mise en forme', 45, 10.00, 22000.00, 15.00, 33000.00 FROM types_soins WHERE nom = 'Soins & Traitements'
+  ON CONFLICT DO NOTHING
+`);
+await pool.query(`
+  INSERT INTO soins (type_soin_id, nom, description, duree_minutes, prix_salon, prix_salon_cdf, prix_domicile, prix_domicile_cdf)
+  SELECT id, 'Soin hydratant profond', 'Masque nourrissant et restructurant', 60, 12.00, 26400.00, 18.00, 39600.00 FROM types_soins WHERE nom = 'Soins & Traitements'
+  ON CONFLICT DO NOTHING
+`);
+await pool.query(`
+  INSERT INTO soins (type_soin_id, nom, description, duree_minutes, prix_salon, prix_salon_cdf, prix_domicile, prix_domicile_cdf)
+  SELECT id, 'Défrisage', 'Lissage chimique professionnel', 90, 18.00, 39600.00, 25.00, 55000.00 FROM types_soins WHERE nom = 'Soins & Traitements'
+  ON CONFLICT DO NOTHING
+`);
+await pool.query(`
+  INSERT INTO soins (type_soin_id, nom, description, duree_minutes, prix_salon, prix_salon_cdf, prix_domicile, prix_domicile_cdf)
+  SELECT id, 'Tissage mi-long', 'Pose de tissage naturel', 120, 28.00, 61600.00, 38.00, 83600.00 FROM types_soins WHERE nom = 'Tissage & Perruques'
+  ON CONFLICT DO NOTHING
+`);
+await pool.query(`
+  INSERT INTO soins (type_soin_id, nom, description, duree_minutes, prix_salon, prix_salon_cdf, prix_domicile, prix_domicile_cdf)
+  SELECT id, 'Pose de perruque', 'Installation et coiffage perruque', 90, 22.00, 48400.00, 30.00, 66000.00 FROM types_soins WHERE nom = 'Tissage & Perruques'
+  ON CONFLICT DO NOTHING
+`);
+await pool.query(`
+  INSERT INTO soins (type_soin_id, nom, description, duree_minutes, prix_salon, prix_salon_cdf, prix_domicile, prix_domicile_cdf)
+  SELECT id, 'Coiffure mariage', 'Coiffure élaborée pour mariée', 180, 80.00, 176000.00, 100.00, 220000.00 FROM types_soins WHERE nom = 'Coiffures Événement'
+  ON CONFLICT DO NOTHING
+`);
+await pool.query(`
+  INSERT INTO soins (type_soin_id, nom, description, duree_minutes, prix_salon, prix_salon_cdf, prix_domicile, prix_domicile_cdf)
+  SELECT id, 'Coiffure soirée', 'Mise en beauté pour soirée', 90, 30.00, 66000.00, 40.00, 88000.00 FROM types_soins WHERE nom = 'Coiffures Événement'
+  ON CONFLICT DO NOTHING
+`);
+
     await pool.query(`
       INSERT INTO utilisateurs (nom, prenom, email, mot_de_passe, telephone, role) VALUES
       ('Diallo', 'Aminata', 'aminata@afrosa.cd', '$2b$10$placeholder_hash', '+243810000001', 'coiffeuse'),
