@@ -20,6 +20,12 @@ const getCreneauxDisponibles = async (coiffeuseId, soinId, date) => {
     [coiffeuse.rows[0].salon_id, jourSemaine]
   );
 
+  console.log('Jour semaine:', jourSemaine);
+  console.log('Horaire trouvé:', JSON.stringify(horaire.rows[0]));
+
+  if (horaire.rows.length === 0) return [];
+  );
+
   if (horaire.rows.length === 0) return [];
 
   const ouverture = horaire.rows[0].heure_ouverture;
