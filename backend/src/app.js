@@ -136,6 +136,19 @@ app.get('/api/reseed', async (req, res) => {
       ('Afrosa Kinshasa', 'Boulevard du 30 Juin, Kinshasa', 'Kinshasa', '+243810005678'),
       ('Afrosa Ngaliema', 'Avenue Victoire, Ngaliema', 'Kinshasa', '+243810009012')`);
 
+await pool.query(`INSERT INTO horaires_salon (salon_id, jour, heure_ouverture, heure_fermeture)
+  SELECT id, 'lundi', '09:00', '19:00' FROM salons`);
+await pool.query(`INSERT INTO horaires_salon (salon_id, jour, heure_ouverture, heure_fermeture)
+  SELECT id, 'mardi', '09:00', '19:00' FROM salons`);
+await pool.query(`INSERT INTO horaires_salon (salon_id, jour, heure_ouverture, heure_fermeture)
+  SELECT id, 'mercredi', '09:00', '19:00' FROM salons`);
+await pool.query(`INSERT INTO horaires_salon (salon_id, jour, heure_ouverture, heure_fermeture)
+  SELECT id, 'jeudi', '09:00', '19:00' FROM salons`);
+await pool.query(`INSERT INTO horaires_salon (salon_id, jour, heure_ouverture, heure_fermeture)
+  SELECT id, 'vendredi', '09:00', '19:00' FROM salons`);
+await pool.query(`INSERT INTO horaires_salon (salon_id, jour, heure_ouverture, heure_fermeture)
+  SELECT id, 'samedi', '08:00', '18:00' FROM salons`);
+
     const salons = await pool.query('SELECT id, nom FROM salons ORDER BY nom');
     const salonGombe = salons.rows.find(s => s.nom === 'Afrosa Gombe')?.id;
     const salonKinshasa = salons.rows.find(s => s.nom === 'Afrosa Kinshasa')?.id;
