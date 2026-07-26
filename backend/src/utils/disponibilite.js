@@ -24,9 +24,6 @@ const getCreneauxDisponibles = async (coiffeuseId, soinId, date) => {
   console.log('Horaire trouvé:', JSON.stringify(horaire.rows[0]));
 
   if (horaire.rows.length === 0) return [];
-  );
-
-  if (horaire.rows.length === 0) return [];
 
   const ouverture = horaire.rows[0].heure_ouverture;
   const fermeture = horaire.rows[0].heure_fermeture;
@@ -42,7 +39,6 @@ const getCreneauxDisponibles = async (coiffeuseId, soinId, date) => {
 
   const [hOuv, mOuv] = ouverture.split(':').map(Number);
   const [hFerm, mFerm] = fermeture.split(':').map(Number);
-
   const debut = hOuv * 60 + mOuv;
   const fin = hFerm * 60 + mFerm;
 
