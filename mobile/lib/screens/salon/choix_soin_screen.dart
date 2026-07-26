@@ -20,9 +20,11 @@ class _ChoixSoinScreenState extends State<ChoixSoinScreen> {
   }
 
   Future<void> _chargerSoins() async {
-    final data = await ApiService.get('/soins');
-    setState(() { _soins = data; _chargement = false; });
-  }
+   print('Chargement soins pour salon: ${widget.salonId}');
+   final data = await ApiService.get('/soins');
+   print('Soins reçus: ${data.length}');
+   setState(() { _soins = data; _chargement = false; });
+ }
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +45,7 @@ class _ChoixSoinScreenState extends State<ChoixSoinScreen> {
                     title: Text(soin['nom'], style: const TextStyle(fontWeight: FontWeight.bold)),
                     subtitle: Text('${soin['duree_minutes']} min • ${soin['prix_salon']}\$'),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                    onTap: () => context.go('/salon/coiffeuse', extra: {
+                    onTap: () => context.push('/salon/coiffeuse', extra: {
                       'salonId': widget.salonId,
                       'soinId': soin['id'],
                       'soinNom': soin['nom'],

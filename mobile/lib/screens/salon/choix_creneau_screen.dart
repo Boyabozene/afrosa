@@ -45,7 +45,7 @@ class _ChoixCreneauScreenState extends State<ChoixCreneauScreen> {
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, childAspectRatio: 2.5, crossAxisSpacing: 8, mainAxisSpacing: 8),
                 itemCount: _creneaux.length,
                 itemBuilder: (context, i) => ElevatedButton(
-                  onPressed: () => context.go('/paiement', extra: {
+                  onPressed: () => context.push('/paiement', extra: {
                     ...widget.extra,
                     'dateHeure': '${_date.year}-${_date.month.toString().padLeft(2,'0')}-${_date.day.toString().padLeft(2,'0')}T${_creneaux[i]}:00',
                     'type': 'salon',

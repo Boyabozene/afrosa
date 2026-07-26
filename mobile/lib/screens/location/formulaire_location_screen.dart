@@ -70,7 +70,7 @@ class _FormulaireLocationScreenState extends State<FormulaireLocationScreen> {
             ),
             const SizedBox(height: 24),
             SizedBox(width: double.infinity, child: ElevatedButton(
-              onPressed: () => context.go('/paiement', extra: {
+              onPressed: () => context.push('/paiement', extra: {
                 'type': 'location',
                 'coiffeuseId': widget.coiffeuse['id'],
                 'coiffeuseNom': '${widget.coiffeuse['prenom']} ${widget.coiffeuse['nom']}',

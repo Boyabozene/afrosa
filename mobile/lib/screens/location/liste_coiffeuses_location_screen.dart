@@ -39,7 +39,7 @@ class _ListeCoiffeusesLocationScreenState extends State<ListeCoiffeusesLocationS
                     title: Text('${c['prenom']} ${c['nom']}', style: const TextStyle(fontWeight: FontWeight.bold)),
                     subtitle: Text('${c['tarif_journee']}\$/jour • ${c['salon_nom']}'),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                    onTap: () => context.go('/location/formulaire', extra: c),
+                    onTap: () => context.push('/location/formulaire', extra: c),
                   ),
                 );
               },

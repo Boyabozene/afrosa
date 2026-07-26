@@ -44,7 +44,7 @@ class _ChoixCoiffeuseScreenState extends State<ChoixCoiffeuseScreen> {
                     title: Text('${c['prenom']} ${c['nom']}', style: const TextStyle(fontWeight: FontWeight.bold)),
                     subtitle: Text(c['bio'] ?? ''),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                    onTap: () => context.go('/salon/creneau', extra: {
+                    onTap: () => context.push('/salon/creneau', extra: {
                       ...widget.extra,
                       'coiffeuseId': c['id'],
                       'coiffeuseNom': '${c['prenom']} ${c['nom']}',

@@ -18,6 +18,7 @@ class _ChoixCoiffeusesDomicileScreenState extends State<ChoixCoiffeusesDomicileS
 
   Future<void> _chargerCoiffeuses() async {
     final data = await ApiService.get('/coiffeuses/domicile');
+    print('Coiffeuses reçues: $data');
     setState(() { _coiffeuses = data; _chargement = false; });
   }
 
@@ -39,7 +40,7 @@ class _ChoixCoiffeusesDomicileScreenState extends State<ChoixCoiffeusesDomicileS
                     title: Text('${c['prenom']} ${c['nom']}', style: const TextStyle(fontWeight: FontWeight.bold)),
                     subtitle: Text(c['bio'] ?? ''),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                    onTap: () => context.go('/domicile/adresse', extra: {
+                    onTap: () => context.push('/domicile/adresse', extra: {
                       'coiffeuseId': c['id'],
                       'coiffeuseNom': '${c['prenom']} ${c['nom']}',
                       'soinId': widget.soinId,

@@ -38,7 +38,7 @@ class _ChoixSoinDomicileScreenState extends State<ChoixSoinDomicileScreen> {
                     title: Text(soin['nom'], style: const TextStyle(fontWeight: FontWeight.bold)),
                     subtitle: Text('${soin['duree_minutes']} min • ${soin['prix_domicile']}\$'),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                    onTap: () => context.go('/domicile/coiffeuse', extra: soin['id']),
+                    onTap: () => context.push('/domicile/coiffeuse', extra: soin['id']),
                   ),
                 );
               },

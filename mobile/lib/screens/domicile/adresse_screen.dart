@@ -32,7 +32,7 @@ class _AdresseScreenState extends State<AdresseScreen> {
             ),
             const SizedBox(height: 24),
             SizedBox(width: double.infinity, child: ElevatedButton(
-              onPressed: () => context.go('/paiement', extra: {
+              onPressed: () => context.push('/paiement', extra: {
                 ...widget.extra,
                 'adresse': _adresseController.text,
                 'dateHeure': '${_date.year}-${_date.month.toString().padLeft(2,'0')}-${_date.day.toString().padLeft(2,'0')}T09:00:00',

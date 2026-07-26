@@ -43,7 +43,10 @@ class _ListeSalonsScreenState extends State<ListeSalonsScreen> {
                     title: Text(salon['nom'], style: const TextStyle(fontWeight: FontWeight.bold)),
                     subtitle: Text(salon['adresse']),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                    onTap: () => context.go('/salon/soin', extra: salon['id']),
+                    onTap: () {
+  			print('Salon ID: ${salon['id']}');
+  			context.push('/salon/soin', extra: salon['id']);
+			},
                   ),
                 );
               },
