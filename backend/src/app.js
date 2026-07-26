@@ -12,6 +12,8 @@ const coiffeuseRoutes = require('./routes/coiffeuseRoutes');
 const reservationSalonRoutes = require('./routes/reservationSalonRoutes');
 const reservationDomicileRoutes = require('./routes/reservationDomicileRoutes');
 const locationRoutes = require('./routes/locationRoutes');
+const { verifierToken } = require('./middlewares/authMiddleware');
+const { verifierRole } = require('./middlewares/roleMiddleware');
 
 const app = express();
 
@@ -54,55 +56,45 @@ app.use('/api/reservations/salon', reservationSalonRoutes);
 app.use('/api/reservations/domicile', reservationDomicileRoutes);
 app.use('/api/locations', locationRoutes);
 
-const runMigrations = async () => {
-  const migrationsPath = path.join(__dirname, '../database/migrations');
-  if (!fs.existsSync(migrationsPath)) return;
-  const files = fs.readdirSync(migrationsPath).sort();
-  for (const file of files) {
-    const sql = fs.readFileSync(path.join(migrationsPath, file), 'utf8');
-    try {
-      await pool.query(sql);
-      console.log(`Migration OK: ${file}`);
-    } catch (err) {
-      if (!err.message.includes('already exists')) {
-        console.error(`Migration erreur ${file}:`, err.message);
-      }
-    }
+app.get('/api/admin/stats', verifierToken, verifierRole('admin'), async (req, res) => {
+  try {
+    const salons = await pool.query('SELECT COUNT(*) FROM salons');
+    const coiffeuses = await pool.query('SELECT COUNT(*) FROM coiffeuses');
+    const reservationsSalon = await pool.query('SELECT COUNT(*) FROM reservations_salon');
+    const reservationsDomicile = await pool.query('SELECT COUNT(*) FROM reservations_domicile');
+    const locations = await pool.query('SELECT COUNT(*) FROM locations_coiffeuse');
+    res.json({
+      salons: parseInt(salons.rows[0].count),
+      coiffeuses: parseInt(coiffeuses.rows[0].count),
+      reservations_salon: parseInt(reservationsSalon.rows[0].count),
+      reservations_domicile: parseInt(reservationsDomicile.rows[0].count),
+      locations: parseInt(locations.rows[0].count),
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
-};
+});
 
-const runSeeds = async () => {
-  const seedsPath = path.join(__dirname, '../database/seeds');
-  if (!fs.existsSync(seedsPath)) return;
-  const files = fs.readdirSync(seedsPath).sort();
-  for (const file of files) {
-    const sql = fs.readFileSync(path.join(seedsPath, file), 'utf8');
-    try {
-      await pool.query(sql);
-      console.log(`Seed OK: ${file}`);
-    } catch (err) {
-      if (!err.message.includes('already exists') && !err.message.includes('duplicate')) {
-        console.error(`Seed erreur ${file}:`, err.message);
-      }
-    }
+app.get('/api/admin/reservations', verifierToken, verifierRole('admin'), async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 'salon' as type, rs.id, rs.date_heure, rs.statut, rs.montant, rs.devise,
+        u.nom as cliente_nom, u.prenom as cliente_prenom,
+        uc.nom as coiffeuse_nom, uc.prenom as coiffeuse_prenom,
+        s.nom as soin_nom
+      FROM reservations_salon rs
+      JOIN utilisateurs u ON u.id = rs.cliente_id
+      JOIN coiffeuses c ON c.id = rs.coiffeuse_id
+      JOIN utilisateurs uc ON uc.id = c.utilisateur_id
+      JOIN soins s ON s.id = rs.soin_id
+      ORDER BY rs.date_heure DESC
+      LIMIT 20
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
-};
-
-if (require.main === module) {
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, async () => {
-    console.log(`Afrosa API démarrée sur le port ${PORT}`);
-    await runMigrations();
-    const { rows } = await pool.query('SELECT COUNT(*) FROM salons');
-	if (parseInt(rows[0].count) === 0) {
-  	await runSeeds();
-  	console.log('Seeds exécutés');
-	} else {
-  	console.log('Base déjà peuplée, seeds ignorés');
-	}
-    console.log('Base de données prête');
-  });
-}
+});
 
 app.get('/api/cleanup', async (req, res) => {
   try {
@@ -129,6 +121,7 @@ app.get('/api/reseed', async (req, res) => {
     await pool.query('DELETE FROM soins');
     await pool.query('DELETE FROM types_soins');
     await pool.query('DELETE FROM gammes');
+    await pool.query('DELETE FROM horaires_salon');
     await pool.query('DELETE FROM salons');
 
     await pool.query(`INSERT INTO salons (nom, adresse, ville, telephone) VALUES
@@ -136,18 +129,18 @@ app.get('/api/reseed', async (req, res) => {
       ('Afrosa Kinshasa', 'Boulevard du 30 Juin, Kinshasa', 'Kinshasa', '+243810005678'),
       ('Afrosa Ngaliema', 'Avenue Victoire, Ngaliema', 'Kinshasa', '+243810009012')`);
 
-await pool.query(`INSERT INTO horaires_salon (salon_id, jour, heure_ouverture, heure_fermeture)
-  SELECT id, 'lundi', '09:00', '19:00' FROM salons`);
-await pool.query(`INSERT INTO horaires_salon (salon_id, jour, heure_ouverture, heure_fermeture)
-  SELECT id, 'mardi', '09:00', '19:00' FROM salons`);
-await pool.query(`INSERT INTO horaires_salon (salon_id, jour, heure_ouverture, heure_fermeture)
-  SELECT id, 'mercredi', '09:00', '19:00' FROM salons`);
-await pool.query(`INSERT INTO horaires_salon (salon_id, jour, heure_ouverture, heure_fermeture)
-  SELECT id, 'jeudi', '09:00', '19:00' FROM salons`);
-await pool.query(`INSERT INTO horaires_salon (salon_id, jour, heure_ouverture, heure_fermeture)
-  SELECT id, 'vendredi', '09:00', '19:00' FROM salons`);
-await pool.query(`INSERT INTO horaires_salon (salon_id, jour, heure_ouverture, heure_fermeture)
-  SELECT id, 'samedi', '08:00', '18:00' FROM salons`);
+    await pool.query(`INSERT INTO horaires_salon (salon_id, jour, heure_ouverture, heure_fermeture)
+      SELECT id, 'lundi', '09:00', '19:00' FROM salons`);
+    await pool.query(`INSERT INTO horaires_salon (salon_id, jour, heure_ouverture, heure_fermeture)
+      SELECT id, 'mardi', '09:00', '19:00' FROM salons`);
+    await pool.query(`INSERT INTO horaires_salon (salon_id, jour, heure_ouverture, heure_fermeture)
+      SELECT id, 'mercredi', '09:00', '19:00' FROM salons`);
+    await pool.query(`INSERT INTO horaires_salon (salon_id, jour, heure_ouverture, heure_fermeture)
+      SELECT id, 'jeudi', '09:00', '19:00' FROM salons`);
+    await pool.query(`INSERT INTO horaires_salon (salon_id, jour, heure_ouverture, heure_fermeture)
+      SELECT id, 'vendredi', '09:00', '19:00' FROM salons`);
+    await pool.query(`INSERT INTO horaires_salon (salon_id, jour, heure_ouverture, heure_fermeture)
+      SELECT id, 'samedi', '08:00', '18:00' FROM salons`);
 
     const salons = await pool.query('SELECT id, nom FROM salons ORDER BY nom');
     const salonGombe = salons.rows.find(s => s.nom === 'Afrosa Gombe')?.id;
@@ -210,4 +203,55 @@ await pool.query(`INSERT INTO horaires_salon (salon_id, jour, heure_ouverture, h
     res.status(500).json({ message: err.message });
   }
 });
+
+const runMigrations = async () => {
+  const migrationsPath = path.join(__dirname, '../database/migrations');
+  if (!fs.existsSync(migrationsPath)) return;
+  const files = fs.readdirSync(migrationsPath).sort();
+  for (const file of files) {
+    const sql = fs.readFileSync(path.join(migrationsPath, file), 'utf8');
+    try {
+      await pool.query(sql);
+      console.log(`Migration OK: ${file}`);
+    } catch (err) {
+      if (!err.message.includes('already exists')) {
+        console.error(`Migration erreur ${file}:`, err.message);
+      }
+    }
+  }
+};
+
+const runSeeds = async () => {
+  const seedsPath = path.join(__dirname, '../database/seeds');
+  if (!fs.existsSync(seedsPath)) return;
+  const files = fs.readdirSync(seedsPath).sort();
+  for (const file of files) {
+    const sql = fs.readFileSync(path.join(seedsPath, file), 'utf8');
+    try {
+      await pool.query(sql);
+      console.log(`Seed OK: ${file}`);
+    } catch (err) {
+      if (!err.message.includes('already exists') && !err.message.includes('duplicate')) {
+        console.error(`Seed erreur ${file}:`, err.message);
+      }
+    }
+  }
+};
+
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, async () => {
+    console.log(`Afrosa API démarrée sur le port ${PORT}`);
+    await runMigrations();
+    const { rows } = await pool.query('SELECT COUNT(*) FROM salons');
+    if (parseInt(rows[0].count) === 0) {
+      await runSeeds();
+      console.log('Seeds exécutés');
+    } else {
+      console.log('Base déjà peuplée, seeds ignorés');
+    }
+    console.log('Base de données prête');
+  });
+}
+
 module.exports = app;
