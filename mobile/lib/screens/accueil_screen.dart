@@ -59,7 +59,7 @@ class _AccueilScreenState extends State<AccueilScreen> {
 
   Widget _carteService(BuildContext context, String emoji, String titre, String description, String route) {
     return GestureDetector(
-      onTap: () => context.go(route),
+      onTap: () => context.push(route),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(20),
