@@ -1,3 +1,4 @@
+import 'package:shared_preferences/shared_preferences.dart';
 import 'api_service.dart';
 
 class AuthService {
@@ -8,6 +9,9 @@ class AuthService {
     });
     if (data['token'] != null) {
       await ApiService.saveToken(data['token']);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('role', data['utilisateur']['role'] ?? 'cliente');
+      await prefs.setString('prenom', data['utilisateur']['prenom'] ?? '');
     }
     return data;
   }
@@ -22,12 +26,18 @@ class AuthService {
     });
     if (data['token'] != null) {
       await ApiService.saveToken(data['token']);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('role', data['utilisateur']['role'] ?? 'cliente');
+      await prefs.setString('prenom', data['utilisateur']['prenom'] ?? '');
     }
     return data;
   }
 
   static Future<void> deconnexion() async {
     await ApiService.removeToken();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('role');
+    await prefs.remove('prenom');
   }
 
   static Future<bool> estConnecte() async {

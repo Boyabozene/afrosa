@@ -19,9 +19,15 @@ class _AccueilScreenState extends State<AccueilScreen> {
   }
 
   Future<void> _chargerProfil() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() => _prenom = prefs.getString('prenom') ?? '');
+  final prefs = await SharedPreferences.getInstance();
+  final role = prefs.getString('role') ?? '';
+  setState(() => _prenom = prefs.getString('prenom') ?? '');
+  if (role == 'admin' && mounted) {
+    context.go('/admin/dashboard');
+  } else if (role == 'coiffeuse' && mounted) {
+    context.go('/pro/dashboard');
   }
+}
 
   @override
   Widget build(BuildContext context) {
