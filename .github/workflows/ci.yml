@@ -20,6 +20,11 @@ jobs:
           POSTGRES_HOST_AUTH_METHOD: trust
         ports:
           - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - uses: actions/checkout@v4
@@ -32,6 +37,16 @@ jobs:
       - name: Install dependencies
         working-directory: backend
         run: npm install
+
+      - name: Run migrations
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql://afrosa_user:afrosa123@localhost:5432/afrosa
+        run: |
+          for f in ../database/migrations/*.sql; do
+            echo "Migration: $f"
+            PGPASSWORD=afrosa123 psql -h localhost -U afrosa_user -d afrosa -f "$f"
+          done
 
       - name: Run tests
         working-directory: backend
