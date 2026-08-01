@@ -25,8 +25,8 @@ class _ConnexionScreenState extends State<ConnexionScreen> {
         setState(() => _erreur = data['message'] ?? 'Erreur de connexion');
       }
     } catch (e) {
-      setState(() => _erreur = 'Erreur réseau');
-    } finally {
+  setState(() => _erreur = 'Erreur: ${e.toString()}');
+} finally {
       setState(() => _chargement = false);
     }
   }
