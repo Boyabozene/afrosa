@@ -126,8 +126,8 @@ app.get('/api/reseed', async (req, res) => {
 
     await pool.query(`INSERT INTO salons (nom, adresse, ville, telephone) VALUES
       ('Afrosa Gombe', 'Avenue du Commerce, Gombe', 'Kinshasa', '+243810001234'),
-      ('Afrosa Kinshasa', 'Boulevard du 30 Juin, Kinshasa', 'Kinshasa', '+243810005678'),
-      ('Afrosa Ngaliema', 'Avenue Victoire, Ngaliema', 'Kinshasa', '+243810009012')`);
+      ('Afrosa Kinshasa', 'Avenue Kabambare, Kinshasa', 'Kinshasa', '+243810005678'),
+      ('Afrosa Ngaliema', 'Avenue du Tourisme, Ngaliema', 'Kinshasa', '+243810009012')`);
 
     await pool.query(`INSERT INTO horaires_salon (salon_id, jour, heure_ouverture, heure_fermeture)
       SELECT id, 'lundi', '09:00', '19:00' FROM salons`);
