@@ -183,20 +183,34 @@ app.get('/api/reseed', async (req, res) => {
       SELECT id, 'Coiffure soirée', 'Mise en beauté pour soirée', 90, 30.00, 66000.00, 40.00, 88000.00 FROM types_soins WHERE nom = 'Coiffures Événement'`);
 
     await pool.query(`INSERT INTO utilisateurs (nom, prenom, email, mot_de_passe, telephone, role) VALUES
-      ('Diallo', 'Aminata', 'aminata@afrosa.cd', '$2b$10$placeholder_hash', '+243810000001', 'coiffeuse'),
-      ('Mbaye', 'Fatou', 'fatou@afrosa.cd', '$2b$10$placeholder_hash', '+243810000002', 'coiffeuse'),
-      ('Kouassi', 'Binta', 'binta@afrosa.cd', '$2b$10$placeholder_hash', '+243810000003', 'coiffeuse'),
-      ('Admin', 'Afrosa', 'admin@afrosa.cd', '$2b$10$placeholder_hash', '+243810000000', 'admin')`);
+  ('Mutsunga', 'Reina', 'reina@afrosa.cd', '$2b$10$placeholder_hash', '+243810000001', 'coiffeuse'),
+  ('Bibuya', 'Carrel', 'carrel@afrosa.cd', '$2b$10$placeholder_hash', '+243810000002', 'coiffeuse'),
+  ('Sawa', 'Sylvia', 'sylvia@afrosa.cd', '$2b$10$placeholder_hash', '+243810000003', 'coiffeuse'),
+  ('Kabuo', 'Aline', 'aline@afrosa.cd', '$2b$10$placeholder_hash', '+243810000004', 'coiffeuse'),
+  ('Murhola', 'Jeanne', 'jeanne@afrosa.cd', '$2b$10$placeholder_hash', '+243810000005', 'coiffeuse'),
+  ('Koffi', 'Didi', 'didi@afrosa.cd', '$2b$10$placeholder_hash', '+243810000006', 'coiffeuse'),
+  ('Fiwe', 'Asi', 'asi@afrosa.cd', '$2b$10$placeholder_hash', '+243810000007', 'coiffeuse'),
+  ('Boya', 'Akira', 'akira@afrosa.cd', '$2b$10$placeholder_hash', '+243810000008', 'coiffeuse'),
+  ('Ndolomo', 'Kerene', 'kerene@afrosa.cd', '$2b$10$placeholder_hash', '+243810000009', 'coiffeuse'),
+  ('Boweya', 'Diva', 'diva@afrosa.cd', '$2b$10$placeholder_hash', '+243810000010', 'coiffeuse'),
+  ('Matata', 'Hakuna', 'hakuna@afrosa.cd', '$2b$10$placeholder_hash', '+243810000011', 'coiffeuse'),
+  ('Mutondo', 'Mari', 'mari@afrosa.cd', '$2b$10$placeholder_hash', '+243810000012', 'coiffeuse'),
+  ('Massiala', 'Jenny', 'jenny@afrosa.cd', '$2b$10$placeholder_hash', '+243810000013', 'coiffeuse'),
+  ('Kibwe', 'Melissa', 'melissa@afrosa.cd', '$2b$10$placeholder_hash', '+243810000014', 'coiffeuse'),
+  ('Kavira', 'Pierrette', 'pierrette@afrosa.cd', '$2b$10$placeholder_hash', '+243810000015', 'coiffeuse'),
+  ('Admin', 'Afrosa', 'admin@afrosa.cd', '$2b$10$placeholder_hash', '+243810000000', 'admin')`);
 
     await pool.query(`INSERT INTO coiffeuses (utilisateur_id, salon_id, bio, disponible_domicile, disponible_location, tarif_journee)
-      SELECT u.id, $1, 'Spécialiste tresses et soins naturels, 5 ans d''expérience.', true, true, 50.00
-      FROM utilisateurs u WHERE u.email = 'aminata@afrosa.cd'`, [salonGombe]);
-    await pool.query(`INSERT INTO coiffeuses (utilisateur_id, salon_id, bio, disponible_domicile, disponible_location, tarif_journee)
-      SELECT u.id, $1, 'Experte tissage et perruques, coiffures de mariée.', true, true, 60.00
-      FROM utilisateurs u WHERE u.email = 'fatou@afrosa.cd'`, [salonKinshasa]);
-    await pool.query(`INSERT INTO coiffeuses (utilisateur_id, salon_id, bio, disponible_domicile, disponible_location, tarif_journee)
-      SELECT u.id, $1, 'Passionnée de locks et coiffures naturelles.', false, true, 45.00
-      FROM utilisateurs u WHERE u.email = 'binta@afrosa.cd'`, [salonNgaliema]);
+  SELECT u.id, $1, 'Spécialiste tresses et soins naturels.', true, true, 50.00
+  FROM utilisateurs u WHERE u.email IN ('reina@afrosa.cd', 'carrel@afrosa.cd', 'sylvia@afrosa.cd', 'aline@afrosa.cd', 'jeanne@afrosa.cd')`, [salonGombe]);
+
+await pool.query(`INSERT INTO coiffeuses (utilisateur_id, salon_id, bio, disponible_domicile, disponible_location, tarif_journee)
+  SELECT u.id, $1, 'Experte tissage, perruques et coiffures événement.', true, true, 60.00
+  FROM utilisateurs u WHERE u.email IN ('didi@afrosa.cd', 'asi@afrosa.cd', 'akira@afrosa.cd', 'kerene@afrosa.cd', 'diva@afrosa.cd')`, [salonKinshasa]);
+
+await pool.query(`INSERT INTO coiffeuses (utilisateur_id, salon_id, bio, disponible_domicile, disponible_location, tarif_journee)
+  SELECT u.id, $1, 'Passionnée de locks et coiffures naturelles.', true, true, 45.00
+  FROM utilisateurs u WHERE u.email IN ('hakuna@afrosa.cd', 'mari@afrosa.cd', 'jenny@afrosa.cd', 'melissa@afrosa.cd', 'pierrette@afrosa.cd')`, [salonNgaliema]);
 
     res.json({ message: 'Base recréée avec succès', salons: { gombe: salonGombe, kinshasa: salonKinshasa, ngaliema: salonNgaliema } });
   } catch (err) {
