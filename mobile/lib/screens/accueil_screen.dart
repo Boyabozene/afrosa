@@ -31,22 +31,16 @@ class _AccueilScreenState extends State<AccueilScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF9F5F0),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(),
-              _buildHero(),
-              _buildBadges(),
-              _buildServices(),
-            ],
-          ),
-        ),
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHeader(),
+          _buildHero(),
+          _buildBadges(),
+          _buildServices(),
+        ],
       ),
-      bottomNavigationBar: _buildBottomNav(),
     );
   }
 
@@ -190,7 +184,7 @@ class _AccueilScreenState extends State<AccueilScreen> {
           _serviceCard('💇‍♀️', 'Réserver en salon', 'Choisissez parmi nos 3 salons à Kinshasa', '/salons'),
           _serviceCard('🏠', 'Soin à domicile', 'Une coiffeuse se déplace chez vous', '/domicile/soin'),
           _serviceCard('✨', 'Louer une coiffeuse', 'Pour mariages, soirées et événements', '/location'),
-          const SizedBox(height: 24),
+          const SizedBox(height: 100),
         ],
       ),
     );
@@ -228,42 +222,6 @@ class _AccueilScreenState extends State<AccueilScreen> {
             const Icon(Icons.arrow_forward_ios, size: 14, color: Color(0xFF6B6B6B)),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildBottomNav() {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0xFFE5E5E5))),
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _navItem(Icons.home_filled, 'Accueil', true, () {}),
-              _navItem(Icons.calendar_today_outlined, 'Mes RDV', false, () => context.push('/mes-reservations')),
-              _navItem(Icons.person_outline, 'Profil', false, () => context.push('/profil')),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _navItem(IconData icon, String label, bool actif, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 24, color: actif ? const Color(0xFF1C1C1C) : const Color(0xFF9B9B9B)),
-          const SizedBox(height: 4),
-          Text(label, style: TextStyle(fontSize: 11, fontWeight: actif ? FontWeight.w600 : FontWeight.w400, color: actif ? const Color(0xFF1C1C1C) : const Color(0xFF9B9B9B))),
-        ],
       ),
     );
   }
