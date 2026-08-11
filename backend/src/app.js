@@ -48,6 +48,22 @@ app.get('/api/migrate-cdf', async (req, res) => {
   }
 });
 
+app.get('/api/diviser-prix', async (req, res) => {
+  try {
+    await pool.query(`
+      UPDATE soins SET
+        prix_salon = prix_salon / 2,
+        prix_salon_cdf = prix_salon_cdf / 2,
+        prix_domicile = prix_domicile / 2,
+        prix_domicile_cdf = prix_domicile_cdf / 2
+    `);
+    await pool.query(`UPDATE coiffeuses SET tarif_journee = tarif_journee / 2`);
+    res.json({ message: 'Prix divisés par 2' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/salons', salonRoutes);
 app.use('/api/soins', soinRoutes);
