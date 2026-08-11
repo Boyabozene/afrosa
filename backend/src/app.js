@@ -64,6 +64,20 @@ app.get('/api/diviser-prix', async (req, res) => {
   }
 });
 
+app.get('/api/migrate-multi', async (req, res) => {
+  try {
+    await pool.query(`
+      ALTER TABLE reservations_salon ADD COLUMN IF NOT EXISTS nb_personnes INT DEFAULT 1;
+      ALTER TABLE reservations_salon ADD COLUMN IF NOT EXISTS remise_pourcentage DECIMAL(5,2) DEFAULT 0;
+      ALTER TABLE locations_coiffeuse ADD COLUMN IF NOT EXISTS nb_coiffeuses INT DEFAULT 1;
+      ALTER TABLE locations_coiffeuse ADD COLUMN IF NOT EXISTS remise_pourcentage DECIMAL(5,2) DEFAULT 0;
+    `);
+    res.json({ message: 'Colonnes multi-coiffeuses ajoutées' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/salons', salonRoutes);
 app.use('/api/soins', soinRoutes);
