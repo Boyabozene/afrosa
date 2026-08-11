@@ -1,7 +1,14 @@
 const pool = require('../config/db');
 
+const calculerRemise = (nb) => {
+  if (nb >= 4) return 20;
+  if (nb === 3) return 15;
+  if (nb === 2) return 10;
+  return 0;
+};
+
 const creerLocation = async (req, res) => {
-  const { coiffeuse_id, type_evenement, date_debut, date_fin, adresse_evenement, devise } = req.body;
+  const { coiffeuse_id, type_evenement, date_debut, date_fin, adresse_evenement, devise, nb_coiffeuses } = req.body;
   const cliente_id = req.utilisateur.id;
   try {
     const coiffeuse = await pool.query('SELECT * FROM coiffeuses WHERE id = $1', [coiffeuse_id]);
@@ -9,19 +16,21 @@ const creerLocation = async (req, res) => {
     const d1 = new Date(date_debut);
     const d2 = new Date(date_fin);
     const nb_jours = Math.ceil((d2 - d1) / (1000 * 60 * 60 * 24)) + 1;
+    const nb = nb_coiffeuses && nb_coiffeuses > 0 ? nb_coiffeuses : 1;
+    const remise = calculerRemise(nb);
     const tarif = coiffeuse.rows[0].tarif_journee;
-    const montant_total = devise === 'CDF' ? tarif * nb_jours * 2200 : tarif * nb_jours;
+    const tarifBrut = devise === 'CDF' ? tarif * 2200 : tarif;
+    const montant_total = tarifBrut * nb_jours * nb * (1 - remise / 100);
     const result = await pool.query(`
-      INSERT INTO locations_coiffeuse (cliente_id, coiffeuse_id, type_evenement, date_debut, date_fin, nb_jours, adresse_evenement, montant_total, devise)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      INSERT INTO locations_coiffeuse (cliente_id, coiffeuse_id, type_evenement, date_debut, date_fin, nb_jours, adresse_evenement, montant_total, devise, nb_coiffeuses, remise_pourcentage)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       RETURNING *
-    `, [cliente_id, coiffeuse_id, type_evenement, date_debut, date_fin, nb_jours, adresse_evenement, montant_total, devise || 'USD']);
+    `, [cliente_id, coiffeuse_id, type_evenement, date_debut, date_fin, nb_jours, adresse_evenement, montant_total, devise || 'USD', nb, remise]);
     res.status(201).json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
-
 const getMesLocations = async (req, res) => {
   const cliente_id = req.utilisateur.id;
   try {

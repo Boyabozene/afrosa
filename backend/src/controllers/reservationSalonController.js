@@ -1,17 +1,27 @@
 const pool = require('../config/db');
 
+const calculerRemise = (nb) => {
+  if (nb >= 4) return 20;
+  if (nb === 3) return 15;
+  if (nb === 2) return 10;
+  return 0;
+};
+
 const creerReservationSalon = async (req, res) => {
-  const { coiffeuse_id, salon_id, soin_id, date_heure, devise } = req.body;
+  const { coiffeuse_id, salon_id, soin_id, date_heure, devise, nb_personnes } = req.body;
   const cliente_id = req.utilisateur.id;
   try {
     const soin = await pool.query('SELECT * FROM soins WHERE id = $1', [soin_id]);
     if (soin.rows.length === 0) return res.status(404).json({ message: 'Soin non trouvé' });
-    const montant = devise === 'CDF' ? soin.rows[0].prix_salon_cdf : soin.rows[0].prix_salon;
+    const nb = nb_personnes && nb_personnes > 0 ? nb_personnes : 1;
+    const remise = calculerRemise(nb);
+    const prixUnitaire = devise === 'CDF' ? soin.rows[0].prix_salon_cdf : soin.rows[0].prix_salon;
+    const montant = prixUnitaire * nb * (1 - remise / 100);
     const result = await pool.query(`
-      INSERT INTO reservations_salon (cliente_id, coiffeuse_id, salon_id, soin_id, date_heure, montant, devise)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      INSERT INTO reservations_salon (cliente_id, coiffeuse_id, salon_id, soin_id, date_heure, montant, devise, nb_personnes, remise_pourcentage)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING *
-    `, [cliente_id, coiffeuse_id, salon_id, soin_id, date_heure, montant, devise || 'USD']);
+    `, [cliente_id, coiffeuse_id, salon_id, soin_id, date_heure, montant, devise || 'USD', nb, remise]);
     res.status(201).json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ message: err.message });
