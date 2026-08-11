@@ -1,3 +1,4 @@
+import '../main.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../services/api_service.dart';
@@ -141,7 +142,7 @@ class _MesReservationsScreenState extends State<MesReservationsScreen> with Sing
               child: Row(
                 children: [
                   GestureDetector(
-                    onTap: () => StatefulNavigationShell.of(context).goBranch(0),
+                    onTap: () => StatefulNavigationShell.of(context).goBranch(dernierOngletVisite.value),
                     child: Container(
                       width: 40, height: 40,
                       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFE5E5E5))),

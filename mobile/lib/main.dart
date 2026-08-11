@@ -18,6 +18,7 @@ import 'screens/mes_reservations_screen.dart';
 import 'screens/profil_screen.dart';
 import 'screens/espace_pro/dashboard_coiffeuse_screen.dart';
 import 'screens/espace_pro/admin/dashboard_admin_screen.dart';
+final ValueNotifier<int> dernierOngletVisite = ValueNotifier<int>(0);
 
 void main() {
   runApp(const AfrosaApp());
@@ -135,7 +136,12 @@ class MainShell extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () => navigationShell.goBranch(index),
+        onTap: () {
+          if (navigationShell.currentIndex != 1) {
+            dernierOngletVisite.value = navigationShell.currentIndex;
+          }
+          navigationShell.goBranch(index);
+        },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

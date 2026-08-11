@@ -12,6 +12,8 @@ class AuthService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('role', data['utilisateur']['role'] ?? 'cliente');
       await prefs.setString('prenom', data['utilisateur']['prenom'] ?? '');
+      await prefs.setString('nom', data['utilisateur']['nom'] ?? '');
+      await prefs.setString('email', data['utilisateur']['email'] ?? '');
     }
     return data;
   }
@@ -29,6 +31,8 @@ class AuthService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('role', data['utilisateur']['role'] ?? 'cliente');
       await prefs.setString('prenom', data['utilisateur']['prenom'] ?? '');
+      await prefs.setString('nom', data['utilisateur']['nom'] ?? '');
+      await prefs.setString('email', data['utilisateur']['email'] ?? '');
     }
     return data;
   }
