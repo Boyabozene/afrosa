@@ -19,10 +19,24 @@ class _PaiementScreenState extends State<PaiementScreen> {
   bool _paye = false;
   String? _erreur;
 
+  int get _remisePourcentage {
+    final nb = (widget.extra['nbPersonnes'] ?? widget.extra['nbCoiffeuses'] ?? 1) as int;
+    if (nb >= 4) return 20;
+    if (nb == 3) return 15;
+    if (nb == 2) return 10;
+    return 0;
+  }
+
   double get _montant {
     final m = widget.extra['montant'];
     if (m == null) return 0;
-    return double.tryParse(m.toString()) ?? 0;
+    final base = double.tryParse(m.toString()) ?? 0;
+    final type = widget.extra['type'];
+    if (type == 'salon') {
+      final nb = (widget.extra['nbPersonnes'] ?? 1) as int;
+      return base * nb * (1 - _remisePourcentage / 100);
+    }
+    return base;
   }
 
   double get _montantAffiche => _devise == 'CDF' ? _montant * 2200 : _montant;
@@ -42,6 +56,7 @@ class _PaiementScreenState extends State<PaiementScreen> {
           'soin_id': widget.extra['soinId'],
           'date_heure': widget.extra['dateHeure'],
           'devise': _devise,
+          'nb_personnes': widget.extra['nbPersonnes'] ?? 1,
         };
       } else if (type == 'domicile') {
         endpoint = '/reservations/domicile';

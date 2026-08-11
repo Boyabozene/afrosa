@@ -31,8 +31,9 @@ class _AccueilScreenState extends State<AccueilScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeader(),
@@ -40,6 +41,7 @@ class _AccueilScreenState extends State<AccueilScreen> {
           _buildBadges(),
           _buildServices(),
         ],
+      ),
       ),
     );
   }
@@ -52,7 +54,7 @@ class _AccueilScreenState extends State<AccueilScreen> {
         children: [
           const Text('Afrosa', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Color(0xFF1C1C1C), letterSpacing: -0.5)),
           GestureDetector(
-            onTap: () => context.push('/profil'),
+            onTap: () => context.go('/profil'),
             child: Container(
               width: 40, height: 40,
               decoration: BoxDecoration(
@@ -181,16 +183,16 @@ class _AccueilScreenState extends State<AccueilScreen> {
           const SizedBox(height: 16),
           const Text('Nos services', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF1C1C1C))),
           const SizedBox(height: 16),
-          _serviceCard('💇‍♀️', 'Réserver en salon', 'Choisissez parmi nos 3 salons à Kinshasa', '/salons'),
-          _serviceCard('🏠', 'Soin à domicile', 'Une coiffeuse se déplace chez vous', '/domicile/soin'),
-          _serviceCard('✨', 'Louer une coiffeuse', 'Pour mariages, soirées et événements', '/location'),
+          _serviceCard(Icons.content_cut, 'Réserver en salon', 'Choisissez parmi nos 3 salons à Kinshasa', '/salons'),
+          _serviceCard(Icons.home_outlined, 'Soin à domicile', 'Une coiffeuse se déplace chez vous', '/domicile/soin'),
+          _serviceCard(Icons.auto_awesome_outlined, 'Louer une coiffeuse', 'Pour mariages, soirées et événements', '/location'),
           const SizedBox(height: 100),
         ],
       ),
     );
   }
 
-  Widget _serviceCard(String emoji, String titre, String description, String route) {
+  Widget _serviceCard(IconData icone, String titre, String description, String route) {
     return GestureDetector(
       onTap: () => context.push(route),
       child: Container(
@@ -206,7 +208,7 @@ class _AccueilScreenState extends State<AccueilScreen> {
             Container(
               width: 48, height: 48,
               decoration: BoxDecoration(color: const Color(0xFFF9F5F0), borderRadius: BorderRadius.circular(12)),
-              child: Center(child: Text(emoji, style: const TextStyle(fontSize: 22))),
+              child: Center(child: Icon(icone, color: const Color(0xFF7B2238), size: 22)),
             ),
             const SizedBox(width: 14),
             Expanded(
