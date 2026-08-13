@@ -65,12 +65,43 @@ class _ListeCoiffeusesLocationScreenState extends State<ListeCoiffeusesLocationS
                   ? const Center(child: CircularProgressIndicator(color: Color(0xFF1C1C1C)))
                   : _coiffeuses.isEmpty
                       ? const Center(child: Text('Aucune coiffeuse disponible', style: TextStyle(color: Color(0xFF6B6B6B))))
-                      : ListView.builder(
+                      : ListView(
                           padding: const EdgeInsets.symmetric(horizontal: 24),
-                          itemCount: _coiffeuses.length,
-                          itemBuilder: (context, i) {
-                            final c = _coiffeuses[i];
-                            return GestureDetector(
+                          children: [
+                            GestureDetector(
+                              onTap: () => context.push('/location/formulaire', extra: _coiffeuses.first),
+                              child: Container(
+                                margin: const EdgeInsets.only(bottom: 12),
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF9F5F0),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: const Color(0xFF1C1C1C).withValues(alpha: 0.15)),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 52, height: 52,
+                                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(26), border: Border.all(color: const Color(0xFFE5E5E5))),
+                                      child: const Icon(Icons.shuffle, color: Color(0xFF7B2238), size: 22),
+                                    ),
+                                    const SizedBox(width: 14),
+                                    const Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text('Peu importe la coiffeuse', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF1C1C1C))),
+                                          SizedBox(height: 2),
+                                          Text('On assigne une coiffeuse disponible', style: TextStyle(fontSize: 12, color: Color(0xFF6B6B6B))),
+                                        ],
+                                      ),
+                                    ),
+                                    Icon(Icons.arrow_forward_ios, size: 14, color: Color(0xFF6B6B6B)),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            ..._coiffeuses.map((c) => GestureDetector(
                               onTap: () => context.push('/location/formulaire', extra: c),
                               child: Container(
                                 margin: const EdgeInsets.only(bottom: 12),
@@ -127,8 +158,8 @@ class _ListeCoiffeusesLocationScreenState extends State<ListeCoiffeusesLocationS
                                   ],
                                 ),
                               ),
-                            );
-                          },
+                            )),
+                          ],
                         ),
             ),
           ],

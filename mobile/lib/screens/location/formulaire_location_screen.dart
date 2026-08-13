@@ -13,9 +13,21 @@ class _FormulaireLocationScreenState extends State<FormulaireLocationScreen> {
   final _adresseController = TextEditingController();
   DateTime _dateDebut = DateTime.now().add(const Duration(days: 7));
   DateTime _dateFin = DateTime.now().add(const Duration(days: 7));
+  int _nbCoiffeuses = 1;
 
   int get _nbJours => _dateFin.difference(_dateDebut).inDays + 1;
-  double get _montant => double.parse(widget.coiffeuse['tarif_journee'].toString()) * _nbJours;
+
+  int get _remisePourcentage {
+    if (_nbCoiffeuses >= 4) return 20;
+    if (_nbCoiffeuses == 3) return 15;
+    if (_nbCoiffeuses == 2) return 10;
+    return 0;
+  }
+
+  double get _montant {
+    final base = double.parse(widget.coiffeuse['tarif_journee'].toString()) * _nbJours * _nbCoiffeuses;
+    return base * (1 - _remisePourcentage / 100);
+  }
 
   bool get _formValide => _evenementController.text.trim().isNotEmpty && _adresseController.text.trim().isNotEmpty;
 
@@ -168,13 +180,47 @@ class _FormulaireLocationScreenState extends State<FormulaireLocationScreen> {
                 ],
               ),
               const SizedBox(height: 24),
+              const Text('Nombre de coiffeuses', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF1C1C1C))),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFE5E5E5))),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _remisePourcentage > 0 ? '-$_remisePourcentage% de remise appliquée' : 'À partir de 2, remise automatique',
+                        style: TextStyle(fontSize: 12, color: _remisePourcentage > 0 ? const Color(0xFF7B2238) : const Color(0xFF9B9B9B), fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => setState(() => _nbCoiffeuses = _nbCoiffeuses > 1 ? _nbCoiffeuses - 1 : 1),
+                      child: Container(
+                        width: 32, height: 32,
+                        decoration: BoxDecoration(color: const Color(0xFFF9F5F0), borderRadius: BorderRadius.circular(8)),
+                        child: const Icon(Icons.remove, size: 16, color: Color(0xFF1C1C1C)),
+                      ),
+                    ),
+                    SizedBox(width: 32, child: Text('$_nbCoiffeuses', textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF1C1C1C)))),
+                    GestureDetector(
+                      onTap: () => setState(() => _nbCoiffeuses = _nbCoiffeuses < 10 ? _nbCoiffeuses + 1 : 10),
+                      child: Container(
+                        width: 32, height: 32,
+                        decoration: BoxDecoration(color: const Color(0xFF1C1C1C), borderRadius: BorderRadius.circular(8)),
+                        child: const Icon(Icons.add, size: 16, color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(color: const Color(0xFF1C1C1C), borderRadius: BorderRadius.circular(16)),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('$_nbJours jour${_nbJours > 1 ? 's' : ''}', style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                    Text('$_nbJours jour${_nbJours > 1 ? 's' : ''} • $_nbCoiffeuses coiffeuse${_nbCoiffeuses > 1 ? 's' : ''}', style: const TextStyle(color: Colors.white70, fontSize: 13)),
                     Text('${_montant.toStringAsFixed(2)} USD', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFFF5C97A))),
                   ],
                 ),
@@ -190,6 +236,7 @@ class _FormulaireLocationScreenState extends State<FormulaireLocationScreen> {
                   'dateDebut': '${_dateDebut.year}-${_dateDebut.month.toString().padLeft(2,'0')}-${_dateDebut.day.toString().padLeft(2,'0')}',
                   'dateFin': '${_dateFin.year}-${_dateFin.month.toString().padLeft(2,'0')}-${_dateFin.day.toString().padLeft(2,'0')}',
                   'montant': _montant,
+                  'nbCoiffeuses': _nbCoiffeuses,
                 }),
                 child: Container(
                   width: double.infinity,

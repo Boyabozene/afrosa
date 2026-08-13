@@ -76,6 +76,7 @@ class _PaiementScreenState extends State<PaiementScreen> {
           'date_fin': widget.extra['dateFin'],
           'adresse_evenement': widget.extra['adresseEvenement'],
           'devise': _devise,
+          'nb_coiffeuses': widget.extra['nbCoiffeuses'] ?? 1,
         };
       }
       final data = await ApiService.post(endpoint, body, auth: true);
