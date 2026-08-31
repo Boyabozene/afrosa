@@ -1,4 +1,3 @@
-cat > database/migrations/014_seed_soins.sql <<'EOF'
 INSERT INTO gammes (nom, description)
 SELECT 'Signature', 'Notre gamme premium de soins sur mesure'
 WHERE NOT EXISTS (
@@ -94,4 +93,3 @@ JOIN types_soins t ON t.nom = v.type_nom
 WHERE NOT EXISTS (
   SELECT 1 FROM soins s WHERE s.nom = v.nom
 );
-EOF
