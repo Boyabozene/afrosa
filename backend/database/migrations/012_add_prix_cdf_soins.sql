@@ -1,0 +1,3 @@
+ALTER TABLE soins
+ADD COLUMN IF NOT EXISTS prix_salon_cdf DECIMAL(10,2),
+ADD COLUMN IF NOT EXISTS prix_domicile_cdf DECIMAL(10,2);
